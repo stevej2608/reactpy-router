@@ -10,6 +10,7 @@ from urllib.parse import parse_qs
 from reactpy import (
     component,
     create_context,
+    event,
     html,
     use_context,
     use_location,
@@ -75,12 +76,35 @@ def router_component(
 def link(*children: VdomChild, to: str, **attributes: Any) -> VdomDict:
     """A component that renders a link to the given path"""
     set_location = _use_route_state().set_location
+
+    @event
+    def on_click(event):
+        set_location(Location(**event))
+
     attrs = {
         **attributes,
         "to": to,
-        "onClick": lambda event: set_location(Location(**event)),
+        "onClick": on_click,
     }
     return _link(attrs, *children)
+
+@component
+def Navigate(to: str, **attributes: Any) -> VdomDict:
+    """A component pushes window.history"""
+
+    set_location = _use_route_state().set_location
+
+    @event
+    def on_click(event):
+        set_location(Location(**event))
+
+    attrs = {
+        **attributes,
+        "to": to,
+        "id": f"navigate-{1000}",
+        "onClick": on_click,
+    }
+    return _navigate(attrs)
 
 
 def use_params() -> dict[str, Any]:
@@ -123,9 +147,9 @@ def _match_route(
     return None
 
 
-_link, _history = export(
+_link, _history, _navigate = export(
     module_from_file("reactpy-router", file=Path(__file__).parent / "bundle.js"),
-    ("Link", "History"),
+    ("Link", "History", "Navigate"),
 )
 
 

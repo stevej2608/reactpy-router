@@ -2,12 +2,13 @@
 __version__ = "0.1.1"
 
 from . import simple
-from .core import create_router, link, route, router_component, use_params, use_query
+from .core import create_router, link, Navigate, route, router_component, use_params, use_query
 from .types import Route, RouteCompiler, RouteResolver
 
 __all__ = (
     "create_router",
     "link",
+    "Navigate",
     "route",
     "route",
     "Route",
