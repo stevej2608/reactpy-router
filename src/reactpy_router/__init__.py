@@ -1,5 +1,5 @@
 # the version is statically loaded by setup.py
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 from . import simple
 from .core import create_router, link, Navigate, route, router_component, use_params, use_query
