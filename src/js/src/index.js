@@ -4,6 +4,16 @@ import htm from "htm";
 
 const html = htm.bind(React.createElement);
 
+class ID {
+  static _id = 0;
+
+  static gen(id='component') {
+    const count = ++ID._id
+    return id + '-' + count
+  }
+
+}
+
 export function bind(node) {
   return {
     create: (type, props, children) =>
@@ -56,23 +66,14 @@ export function Link({ to, onClick, children, ...props }) {
  * in an no extra cost
  */
 
-export function Navigate({ to="#", id="???", onClick=null,...props }) {
+export function Navigate({ to="#", onClick=null,...props }) {
 
-  console.log('Navigator(prop=%s)', JSON.stringify(props))
-
-  const handleClick = (event) => {
-    event.preventDefault();
+  const handleClick = () => {
 
     const loc = new URL(to, window.location)
 
     if (loc.href !== window.location['href']) {
-
-      console.log('Navigator.pushState to=%s, log=%s', to, loc)
-
       window.history.pushState({}, to, loc);
-
-      console.log('onClick pathname=%s, search=%s', window.location.pathname, window.location.search)
-
       onClick({
         pathname: window.location.pathname,
         search: window.location.search,
@@ -82,17 +83,8 @@ export function Navigate({ to="#", id="???", onClick=null,...props }) {
 
   };
 
-  React.useEffect(() => {
-      const timeoutId = setTimeout(() => {
-        const el = document.getElementById(id);
-        el.click()
-        // handleClick()
-      }, 200);
-  
-      // Cleanup function to clear the timeout if the component unmounts
-      return () => clearTimeout(timeoutId);
-    }, []); // Empty dependency array ensures the effect runs only once
+  React.useEffect(handleClick, []);
 
-  return html`<a href=${"#"} id=${id} onClick=${handleClick} />`;
+  return html`<div id=${ID.gen('navigate')} />`;
 
 }

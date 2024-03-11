@@ -101,7 +101,6 @@ def Navigate(to: str, **attributes: Any) -> VdomDict:
     attrs = {
         **attributes,
         "to": to,
-        "id": f"navigate-{1000}",
         "onClick": on_click,
     }
     return _navigate(attrs)
