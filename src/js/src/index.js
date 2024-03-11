@@ -41,24 +41,40 @@ export function History({ onChange }) {
 }
 
 export function Link({ to, onClick, children, ...props }) {
-
-  console.log('Link(prop=%s)', JSON.stringify(props))
-
   const handleClick = (event) => {
     event.preventDefault();
-
-    console.log('Link.pushState to=%s', to)
-
     window.history.pushState({}, to, new URL(to, window.location));
-
     onClick({
       pathname: window.location.pathname,
       search: window.location.search,
     });
-
   };
 
-  return html`<a href=${to} onClick=${handleClick} ...${props}>${children}</a>`;
+  // return html`<a href=${to} onClick=${handleClick} ...${props}>${children}</a>`;
+
+  // This is a quick fix to allow links(...) to support
+  // composite html. It will still fail if the composite
+  // supplied is comprised of nested reactpy @components
+
+  var element = html`<a href=${to} onClick=${handleClick} ...${props}
+    >DUMMY</a
+  >`;
+
+  try {
+    var _children = children;
+
+    if (typeof children !== "string" && children instanceof String == false) {
+      if (children.type === "") {
+        _children = children.props.children;
+      }
+    }
+
+    element = React.cloneElement(element, element.props, _children);
+  } catch (error) {
+    console.log("Link failed %s", error.message);
+  }
+
+  return element;
 }
 
 /**
